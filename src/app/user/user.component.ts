@@ -19,7 +19,7 @@ import { MatDialogModule } from '@angular/material/dialog';
 import { DialogAddUserComponent } from '../dialog-add-user/dialog-add-user.component';
 import { User } from '../../models/user.class';
 import { MatCardModule } from '@angular/material/card';
-import { Firestore, collection, collectionData, addDoc, doc, getDoc, updateDoc } from '@angular/fire/firestore';
+import { Firestore, collection, collectionData, addDoc, doc, getDoc, updateDoc, onSnapshot } from '@angular/fire/firestore';
 import { inject } from '@angular/core';
 import { Observable } from 'rxjs';
 import { CommonModule } from '@angular/common';
@@ -44,25 +44,13 @@ import { RouterLink } from '@angular/router';
   templateUrl: './user.component.html',
   styleUrl: './user.component.scss'
 })
-export class UserComponent implements OnInit {
+export class UserComponent {
   user = new User();
-  allUsers: User[] = [];
-  firestore: Firestore = inject(Firestore);
-  items$: Observable<any[]>;
-  aCollection = collection(this.firestore, 'users');
-  positionOptions: TooltipPosition[] = ['after', 'before', 'above', 'below', 'left', 'right'];
-  position = new FormControl(this.positionOptions[2]);
+  allUsers: any = [];
 
-  constructor(public dialog: MatDialog) {
-    const aCollection = collection(this.firestore, 'users')
-    this.items$ = collectionData(aCollection);
-  }
-
-  ngOnInit(): void {
-    this.items$ = collectionData(this.aCollection, { idField: 'customID' });
-    this.items$.subscribe((changes: any) => {
-      this.allUsers = changes;
-      console.log('Received changes from DB', changes);
+  constructor(public dialog: MatDialog, private readonly firestore: Firestore) {
+    onSnapshot(collection(this.firestore, 'users'), (list) => {
+      this.allUsers = list.docs.map(doc => doc.data());
     });
   }
 

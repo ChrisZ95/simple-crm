@@ -9,10 +9,6 @@ import { inject } from '@angular/core';
 import { Firestore, collection, collectionData } from '@angular/fire/firestore';
 import { Observable } from 'rxjs';
 
-interface Item {
-  
-};
-
 @Component({
   selector: 'app-root',
   standalone: true,
@@ -28,13 +24,7 @@ interface Item {
   styleUrl: './app.component.scss'
 })
 export class AppComponent {
-  firestore: Firestore = inject(Firestore);
-  items$: Observable<any[]>;
-
   title = 'simple-crm';
 
-  constructor() {
-    const aCollection = collection(this.firestore, 'items')
-    this.items$ = collectionData(aCollection);
-  }
+  constructor() {}
 }

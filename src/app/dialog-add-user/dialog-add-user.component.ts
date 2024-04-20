@@ -42,29 +42,23 @@ import { CommonModule } from '@angular/common';
 })
 export class DialogAddUserComponent {
   user = new User();
-  birthDate: Date = new Date();
-  loading: boolean = false;
-  firestore: Firestore = inject(Firestore);
-  items$: Observable<any[]>;
-  aCollection = collection(this.firestore, 'users')
+  birthDate!: Date;
+  loading = false;
 
-  constructor(public dialogRef: MatDialogRef<DialogAddUserComponent>) {
-    const aCollection = collection(this.firestore, 'users')
-    this.items$ = collectionData(aCollection);
-  }
+  constructor(public dialogRef: MatDialogRef<DialogAddUserComponent>, public dialog: MatDialog, private readonly firestore: Firestore) {}
 
-  saveUser() {
+  saveUser(){
     this.user.birthDate = this.birthDate.getTime();
-    console.log('Current user is', this.user);
+    console.log('Current User is', this.user);
     this.loading = true;
+
     addDoc(collection(this.firestore, 'users'), this.user.toJSON())
-      .then((result: any) => {
-        this.loading = false;
-        console.log('Adding user finished', result);
-        this.dialogRef.close();
-      })
-      .catch(error => {
-        console.error('Error adding user: ', error);
-      });
+    .then((result: any) => {
+      this.loading = false;
+      this.user['userId'] = result.id
+      updateDoc(doc(this.firestore, 'users', this.user['userId']), this.user.toJSON());
+      console.log(result);
+      this.dialogRef.close();
+    })
   }
 }
